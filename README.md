@@ -10,6 +10,6 @@ Writing enumerations in Go is often a very repetitive task, which is an ideal ca
 
 This is not the only enumeration generator written in Go. For other options, see:
 
-- [https://github.com/abice/go-enum]
-- [https://github.com/alvaroloes/enumer]
-- [https://github.com/steinfletcher/gonum]
+- https://github.com/abice/go-enum
+- https://github.com/alvaroloes/enumer
+- https://github.com/steinfletcher/gonum

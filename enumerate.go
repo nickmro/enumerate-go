@@ -58,12 +58,14 @@ func Write(e *Enum, w io.Writer) error {
 	return nil
 }
 
+// ToSnakeCase transforms a string to snake case.
 func ToSnakeCase(v string) string {
 	v = matchFirstCap.ReplaceAllString(v, `${1}_${2}`)
 	v = matchAnyCap.ReplaceAllString(v, `${1}_${2}`)
 	return strings.ToLower(v)
 }
 
+// ToCamelCase transforms a string to camel case.
 func ToCamelCase(v string) string {
 	v = matchFirstWordChar.ReplaceAllStringFunc(v, func(s string) string {
 		return strings.ToUpper(strings.Replace(s, `_`, ``, -1))

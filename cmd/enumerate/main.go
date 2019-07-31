@@ -23,7 +23,7 @@ func main() {
 		e.Type = *t
 	}
 
-	if v := enumValues; v != nil {
+	if v := enumValues; v != nil && *v != "" {
 		e.Values = strings.Split(*v, ",")
 	}
 

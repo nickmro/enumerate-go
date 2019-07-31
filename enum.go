@@ -18,7 +18,6 @@ import (
 type {{.Type}} int
 
 // The {{.Type}} values
-{{if (gt (len .Values) 0) -}}
 const (
 	_ {{.Type}} = iota
 	{{- $prefix := .Prefix}}
@@ -33,7 +32,6 @@ var {{ toCamelCase .Type }}Strings = map[{{.Type}}]string{
 	{{$prefix}}{{$v}}: "{{ toSnakeCase $v }}",
 	{{- end}}
 }
-{{- end}}
 
 // String returns a string representation of the {{.Type}}
 func (t {{.Type}}) String() string  {

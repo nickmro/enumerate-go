@@ -78,6 +78,14 @@ func ToCamelCase(v string) string {
 	return string(r)
 }
 
+// ToPascalCase transforms a string to Pascal case (first leter captitalized).
+func ToPascalCase(v string) string {
+	v = matchFirstWordChar.ReplaceAllStringFunc(v, func(s string) string {
+		return strings.ToUpper(strings.Replace(s, `_`, ``, -1))
+	})
+	return v
+}
+
 func validate(enum *Enum) error {
 	if enum.Package == "" {
 		return errors.New("package required")

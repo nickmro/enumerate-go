@@ -19,10 +19,12 @@ go build -o $GOPATH/bin/enumerate
 In the directory of the package for which you would like to create the enumeration:
 
 ```bash
-enumerate -type=${TYPE_NAME} -values=${TYPE_VALUES} -prefix=${TYPE_PREFIX}
+enumerate -type=${TYPE_NAME} -values=${TYPE_VALUES} -prefix=${TYPE_PREFIX} -json=${JSON_ENCODING}
 ```
 
 ```
+-json string
+    The JSON encoding type [string, int]
 -prefix string
     The prefix to apply to each enum value
 -type string
@@ -34,7 +36,7 @@ enumerate -type=${TYPE_NAME} -values=${TYPE_VALUES} -prefix=${TYPE_PREFIX}
 ## Example
 
 ```bash
-enumerate -type=UserType -values=Admin,Support -prefix=UserType
+enumerate -type=UserType -values=Admin,Support -prefix=UserType -json=string
 ```
 
 This will produce the type:

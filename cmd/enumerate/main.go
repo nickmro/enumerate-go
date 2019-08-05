@@ -16,7 +16,7 @@ func main() {
 	enumType := flag.String("type", "", "The enum type name")
 	enumValues := flag.String("values", "", "The comma-separated list of enum values")
 	enumPrefix := flag.String("prefix", "", "The prefix to apply to each enum value")
-	enumJSON := flag.String("json", "", "The JSON encoding type (string, int)")
+	enumJSON := flag.String("json", "", "The JSON encoding type [string, int]")
 
 	flag.Parse()
 

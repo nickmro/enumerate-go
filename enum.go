@@ -7,6 +7,7 @@ type Enum struct {
 	Values       []string // The enum values
 	Prefix       string   // The prefix to apply to each enum
 	JSONEncoding Encoding // The JSON encoding type
+	SQLEncoding  Encoding // The SQL encoding type
 }
 
 const enumTemplate = `
@@ -15,6 +16,10 @@ package {{.Package}}
 import (
 	{{- if .JSONEncoding}}
 	"encoding/json"
+	{{- end}}
+	{{- if .SQLEncoding}}
+	"database/sql/driver"
+	"errors"
 	{{- end}}
 )
 
@@ -72,7 +77,46 @@ func (t *{{.Type}}) UnmarshalJSON(b []byte) error {
 }
 {{- end}}
 
-func {{ toCamelCase .Type }}FromString(s string) {{.Type}} {
+{{- if .SQLEncoding}}
+// Value returns the {{.Type}} value for SQL encoding.
+func (t *{{.Type}}) Value() (driver.Value, error) {
+	{{- if eq .SQLEncoding "string" }}
+	return t.String(), nil
+	{{- else}}
+	return t, nil
+	{{- end}}
+}
+
+// Scan scans the {{.Type}} from its SQL encoded value.
+func (t *{{.Type}}) Scan(v interface{}) error {
+	{{- if eq .SQLEncoding "string" }}
+	bv, err := driver.String.ConvertValue(v)
+	if err != nil {
+		*t = 0
+		return errors.New("failed to scan {{.Type}}")
+	}
+
+	if b, ok := bv.([]byte); ok {
+		*t = {{toCamelCase .Type}}FromString(string(b))
+		return nil
+	} else if s, ok := bv.(string); ok {
+		*t = {{toCamelCase .Type}}FromString(s)
+		return nil
+	} else {
+		*t = 0
+		return errors.New("failed to scan {{.Type}}")
+	}
+	{{- else}}
+	if b, ok := v.(int); ok {
+		*t = {{.Type}}(b)
+		return nil
+	}
+	return errors.New("failed to scan {{.Type}}")
+	{{- end}}
+}
+{{- end}}
+
+func {{toCamelCase .Type}}FromString(s string) {{.Type}} {
 	for k, v := range {{ toCamelCase .Type }}Strings {
 		if v == s {
 			return k

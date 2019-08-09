@@ -17,6 +17,7 @@ func main() {
 	enumValues := flag.String("values", "", "The comma-separated list of enum values")
 	enumPrefix := flag.String("prefix", "", "The prefix to apply to each enum value")
 	enumJSON := flag.String("json", "", "The JSON encoding type [string, int]")
+	enumSQL := flag.String("sql", "", "The SQL encoding type [string, int]")
 
 	flag.Parse()
 
@@ -34,6 +35,10 @@ func main() {
 
 	if j := enumJSON; j != nil {
 		e.JSONEncoding = enumerate.Encoding(*j)
+	}
+
+	if s := enumSQL; s != nil {
+		e.SQLEncoding = enumerate.Encoding(*s)
 	}
 
 	wd, err := os.Getwd()

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"go/build"
 	"os"
 	"strings"
@@ -11,51 +12,70 @@ import (
 )
 
 func main() {
-	var e enumerate.Enum
-
-	enumType := flag.String("type", "", "The enum type name")
+	enumType := flag.String("type", "", "The enum type name (Required)")
 	enumValues := flag.String("values", "", "The comma-separated list of enum values")
 	enumPrefix := flag.String("prefix", "", "The prefix to apply to each enum value")
-	enumJSON := flag.String("json", "", "The JSON encoding type [string, int]")
-	enumSQL := flag.String("sql", "", "The SQL encoding type [string, int]")
+	enumJSON := flag.String("json", "", "The JSON encoding type {string, int}")
+	enumSQL := flag.String("sql", "", "The SQL encoding type {string, int}")
 
-	flag.Parse()
+	var e enumerate.Enum
 
-	if t := enumType; t != nil {
-		e.Type = *t
+	if flag.Parse(); !flag.Parsed() {
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
-	if v := enumValues; v != nil && *v != "" {
-		e.Values = strings.Split(*v, ",")
+	if enumType == nil || *enumType == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
-	if p := enumPrefix; p != nil {
-		e.Prefix = *p
+	e.Type = *enumType
+
+	if enumValues != nil && *enumValues != "" {
+		e.Values = strings.Split(*enumValues, ",")
 	}
 
-	if j := enumJSON; j != nil {
-		e.JSONEncoding = enumerate.Encoding(*j)
+	if enumPrefix != nil {
+		e.Prefix = *enumPrefix
 	}
 
-	if s := enumSQL; s != nil {
-		e.SQLEncoding = enumerate.Encoding(*s)
+	if enumJSON != nil && *enumJSON != "" {
+		if j := enumerate.EncodingFromString(*enumJSON); j != 0 {
+			e.JSONEncoding = j
+		} else {
+			flag.PrintDefaults()
+			os.Exit(1)
+		}
+	}
+
+	if enumSQL != nil && *enumSQL != "" {
+		if s := enumerate.EncodingFromString(*enumSQL); s != 0 {
+			e.SQLEncoding = s
+		} else {
+			flag.PrintDefaults()
+			os.Exit(1)
+		}
 	}
 
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	p, err := getPackageName(wd)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	e.Package = p
 
 	f, err := os.Create(fileName(e.Type))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	defer f.Close()
 
@@ -64,7 +84,8 @@ func main() {
 
 	err = enumerate.Write(&e, w)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 

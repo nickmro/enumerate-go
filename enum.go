@@ -30,18 +30,18 @@ const (
 	_ {{.Type}} = iota
 	{{- $prefix := .Prefix}}
 	{{- range $i, $v := .Values}}
-	{{$prefix}}{{$v}}
+	{{if $prefix}}{{ toPascalCase $prefix }}{{end}}{{ toPascalCase $v }}
 	{{- end}}
 )
 
 var {{ toCamelCase .Type }}Strings = map[{{.Type}}]string{
 	{{- $prefix := .Prefix}}
 	{{- range $i, $v := .Values}}
-	{{$prefix}}{{$v}}: "{{ toSnakeCase $v }}",
+	{{if $prefix}}{{ toPascalCase $prefix }}{{end}}{{ toPascalCase $v }}: "{{ toSnakeCase $v }}",
 	{{- end}}
 }
 
-// String returns a string representation of the {{.Type}}
+// String returns a string representation of the {{.Type}}.
 func (t {{.Type}}) String() string  {
 	if v, ok := {{ toCamelCase .Type }}Strings[t]; ok {
 		return v
@@ -49,10 +49,20 @@ func (t {{.Type}}) String() string  {
 	return ""
 }
 
+// {{.Type}}FromString returns the {{.Type}} from the given string.
+func {{ toPascalCase .Type }}FromString(s string) {{.Type}} {
+	for k, v := range {{ toCamelCase .Type }}Strings {
+		if v == s {
+			return k
+		}
+	}
+	return 0
+}
+
 {{- if .JSONEncoding}}
 // MarshalJSON marshals the {{.Type}} to JSON.
 func (t {{.Type}}) MarshalJSON() ([]byte, error) {
-	{{- if eq .JSONEncoding "string" }}
+	{{- if eq .JSONEncoding 1 }}
 	return json.Marshal(t.String())
 	{{- else}}
 	return t
@@ -61,7 +71,7 @@ func (t {{.Type}}) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals the {{.Type}} from JSON.
 func (t *{{.Type}}) UnmarshalJSON(b []byte) error {
-	{{- if eq .JSONEncoding "string" }}
+	{{- if eq .JSONEncoding 1 }}
 	var v string
 	{{- else}}
 	var v int
@@ -69,18 +79,19 @@ func (t *{{.Type}}) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
-	{{- if eq .JSONEncoding "string" }}
-	*t = {{ toCamelCase .Type }}FromString(v)
+	{{- if eq .JSONEncoding 1 }}
+	*t = {{ toPascalCase .Type }}FromString(v)
 	{{- else}}
 	*t = v
 	{{- end}}
+	return nil
 }
 {{- end}}
 
 {{- if .SQLEncoding}}
 // Value returns the {{.Type}} value for SQL encoding.
 func (t *{{.Type}}) Value() (driver.Value, error) {
-	{{- if eq .SQLEncoding "string" }}
+	{{- if eq .SQLEncoding 1 }}
 	return t.String(), nil
 	{{- else}}
 	return t, nil
@@ -89,7 +100,7 @@ func (t *{{.Type}}) Value() (driver.Value, error) {
 
 // Scan scans the {{.Type}} from its SQL encoded value.
 func (t *{{.Type}}) Scan(v interface{}) error {
-	{{- if eq .SQLEncoding "string" }}
+	{{- if eq .SQLEncoding 1 }}
 	bv, err := driver.String.ConvertValue(v)
 	if err != nil {
 		*t = 0
@@ -97,10 +108,10 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 	}
 
 	if b, ok := bv.([]byte); ok {
-		*t = {{toCamelCase .Type}}FromString(string(b))
+		*t = {{toPascalCase .Type}}FromString(string(b))
 		return nil
 	} else if s, ok := bv.(string); ok {
-		*t = {{toCamelCase .Type}}FromString(s)
+		*t = {{toPascalCase .Type}}FromString(s)
 		return nil
 	} else {
 		*t = 0
@@ -115,14 +126,5 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 	{{- end}}
 }
 {{- end}}
-
-func {{toCamelCase .Type}}FromString(s string) {{.Type}} {
-	for k, v := range {{ toCamelCase .Type }}Strings {
-		if v == s {
-			return k
-		}
-	}
-	return 0
-}
 
 `

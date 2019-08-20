@@ -24,8 +24,9 @@ func Write(e *Enum, w io.Writer) error {
 	}
 
 	f := template.FuncMap{
-		"toCamelCase": ToCamelCase,
-		"toSnakeCase": ToSnakeCase,
+		"toCamelCase":  ToCamelCase,
+		"toSnakeCase":  ToSnakeCase,
+		"toPascalCase": ToPascalCase,
 	}
 
 	// Create a new template
@@ -83,7 +84,11 @@ func ToPascalCase(v string) string {
 	v = matchFirstWordChar.ReplaceAllStringFunc(v, func(s string) string {
 		return strings.ToUpper(strings.Replace(s, `_`, ``, -1))
 	})
-	return v
+
+	// uppercase first character
+	r := []rune(v)
+	r[0] = []rune(strings.ToUpper(string(r[0])))[0]
+	return string(r)
 }
 
 func validate(enum *Enum) error {

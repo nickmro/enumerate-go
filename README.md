@@ -24,21 +24,25 @@ enumerate -type=${TYPE_NAME} -values=${TYPE_VALUES} -prefix=${TYPE_PREFIX} -json
 
 ```
 -json string
-    The JSON encoding type [string, int]
+	The JSON encoding type {string, int}
 -prefix string
-    The prefix to apply to each enum value
+	The prefix to apply to each enum value
 -sql string
-    The SQL encoding type [string, int]
+	The SQL encoding type {string, int}
 -type string
-    The enum type name
+	The enum type name (Required)
 -values string
-    The comma-separated list of enum values
+	The comma-separated list of enum values
 ```
 
 ## Example
 
 ```bash
-enumerate -type=UserType -values=Admin,Support -prefix=UserType -json=string -sql=string
+./bin/enumerate --type UserType \
+	--prefix UserType \
+	--values Admin,Support \
+	--json string \
+	--sql string
 ```
 
 This will produce the following file:
@@ -65,12 +69,22 @@ var userTypeStrings = map[UserType]string{
 	UserTypeSupport: "support",
 }
 
-// String returns a string representation of the UserType
+// String returns a string representation of the UserType.
 func (t UserType) String() string {
 	if v, ok := userTypeStrings[t]; ok {
 		return v
 	}
 	return ""
+}
+
+// UserTypeFromString returns the UserType from the given string.
+func UserTypeFromString(s string) UserType {
+	for k, v := range userTypeStrings {
+		if v == s {
+			return k
+		}
+	}
+	return 0
 }
 
 // MarshalJSON marshals the UserType to JSON.
@@ -84,7 +98,8 @@ func (t *UserType) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
 	}
-	*t = userTypeFromString(v)
+	*t = UserTypeFromString(v)
+	return nil
 }
 
 // Value returns the UserType value for SQL encoding.
@@ -101,24 +116,15 @@ func (t *UserType) Scan(v interface{}) error {
 	}
 
 	if b, ok := bv.([]byte); ok {
-		*t = userTypeFromString(string(b))
+		*t = UserTypeFromString(string(b))
 		return nil
 	} else if s, ok := bv.(string); ok {
-		*t = userTypeFromString(s)
+		*t = UserTypeFromString(s)
 		return nil
 	} else {
 		*t = 0
 		return errors.New("failed to scan UserType")
 	}
-}
-
-func userTypeFromString(s string) UserType {
-	for k, v := range userTypeStrings {
-		if v == s {
-			return k
-		}
-	}
-	return 0
 }
 ```
 

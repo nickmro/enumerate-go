@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nickmro/enumerate-go"
+	"github.com/nickmro/gonumerate"
 )
 
 const usageText = `Usage:
- enumerate [OPTION]...
+ gonumerate [OPTION]...
 
 Options:
  -type    The enum type name (Required)
@@ -31,7 +31,7 @@ func main() {
 	sqlOpt := flag.String("sql", "", "The SQL encoding type {string, int}")
 	printOpt := flag.Bool("help", false, "Print usage")
 
-	var e enumerate.Enum
+	var e gonumerate.Enum
 
 	if flag.Parse(); !flag.Parsed() {
 		fmt.Println(usageText)
@@ -59,7 +59,7 @@ func main() {
 	}
 
 	if jsonOpt != nil && *jsonOpt != "" {
-		if j := enumerate.EncodingFromString(*jsonOpt); j != 0 {
+		if j := gonumerate.EncodingFromString(*jsonOpt); j != 0 {
 			e.JSONEncoding = j
 		} else {
 			fmt.Println(usageText)
@@ -68,7 +68,7 @@ func main() {
 	}
 
 	if sqlOpt != nil && *sqlOpt != "" {
-		if s := enumerate.EncodingFromString(*sqlOpt); s != 0 {
+		if s := gonumerate.EncodingFromString(*sqlOpt); s != 0 {
 			e.SQLEncoding = s
 		} else {
 			fmt.Println(usageText)
@@ -100,7 +100,7 @@ func main() {
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 
-	err = enumerate.Write(&e, w)
+	err = e.Write(w)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

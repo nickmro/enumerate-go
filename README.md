@@ -1,6 +1,6 @@
-# Enumerate
+# Gonumerate
 
-Enumerate is an enumeration generator for Go.
+Gonumerate is an enumeration generator for Go.
 
 ## Why?
 
@@ -9,16 +9,16 @@ Writing enumerations in Go can be achieved using a type alias, but adding method
 ## Installation
 
 ```bash
-go get -u github.com/nickmro/enumerate-go
-cd $GOPATH/src/github.com/nickmro/enumerate-go/cmd/enumerate
-go build -o $GOPATH/bin/enumerate
+go get -u github.com/nickmro/gonumerate
+cd $GOPATH/src/github.com/nickmro/gonumerate/cmd/gonumerate
+go build -o $GOPATH/bin/gonumerate
 ```
 
 ## Usage
 
 ```
 Usage:
- enumerate [OPTION]...
+ gonumerate [OPTION]...
 
 Options:
  -type    The enum type name (Required)
@@ -32,7 +32,7 @@ Options:
 ## Example
 
 ```bash
-enumerate --type UserType \
+gonumerate --type UserType \
 	--prefix UserType \
 	--values Admin,Support \
 	--json string \
@@ -41,7 +41,7 @@ enumerate --type UserType \
 
 This will produce the following file:
 ```go
-package enumerate
+package gonumerate
 
 import (
 	"database/sql/driver"

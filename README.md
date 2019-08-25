@@ -14,31 +14,25 @@ cd $GOPATH/src/github.com/nickmro/enumerate-go/cmd/enumerate
 go build -o $GOPATH/bin/enumerate
 ```
 
-## Instructions
-
-In the directory of the package for which you would like to create the enumeration:
-
-```bash
-enumerate -type=${TYPE_NAME} -values=${TYPE_VALUES} -prefix=${TYPE_PREFIX} -json=${JSON_ENCODING} -sql=${SQL_ENCODING}
-```
+## Usage
 
 ```
--json string
-	The JSON encoding type {string, int}
--prefix string
-	The prefix to apply to each enum value
--sql string
-	The SQL encoding type {string, int}
--type string
-	The enum type name (Required)
--values string
-	The comma-separated list of enum values
+Usage:
+ enumerate [OPTION]...
+
+Options:
+ -type    The enum type name (Required)
+ -values  The enum values
+ -prefix  The prefix to apply to each enum value
+ -json    The JSON encoding type {string, int}
+ -sql     The SQL encoding type {string, int}
+ -help    Print usage
 ```
 
 ## Example
 
 ```bash
-./bin/enumerate --type UserType \
+enumerate --type UserType \
 	--prefix UserType \
 	--values Admin,Support \
 	--json string \

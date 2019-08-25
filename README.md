@@ -1,4 +1,5 @@
 # Gonumerate
+[![Build Status](https://travis-ci.com/nickmro/gonumerate.svg?branch=master)](https://travis-ci.com/nickmro/gonumerate)
 
 Gonumerate is an enumeration generator for Go.
 

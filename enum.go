@@ -1,7 +1,12 @@
 package enumerate
 
 import (
+	"bytes"
+	"errors"
+	"go/format"
+	"io"
 	"strings"
+	"text/template"
 )
 
 // Enum represents an enumeration file template.
@@ -126,8 +131,45 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 	{{- end}}
 }
 {{- end}}
-
 `
+
+var ErrPackageRequred = errors.New("package required")
+var ErrTypeRequired = errors.New("type required")
+
+// Write writes an enum file to an io.Writer.
+func (e *Enum) Write(w io.Writer) error {
+	if err := e.Validate(); err != nil {
+		return err
+	}
+
+	// Create a new template
+	t, err := template.New("enum").
+		Parse(enumTemplate)
+	if err != nil {
+		return err
+	}
+
+	// Write the template to a buffer
+	var buf bytes.Buffer
+	err = t.Execute(&buf, e)
+	if err != nil {
+		return err
+	}
+
+	// Format the code
+	b, err := format.Source(buf.Bytes())
+	if err != nil {
+		return err
+	}
+
+	// Write the code to a file
+	_, err = w.Write(b)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // FileName returns the enum's file name.
 func (e Enum) FileName() string {
@@ -171,10 +213,7 @@ func (e Enum) ConstructorName() string {
 func (e Enum) ValueNames() []string {
 	names := []string{}
 	for _, v := range e.Values {
-		b := strings.Builder{}
-		b.WriteString(toPascalCase(e.Prefix))
-		b.WriteString(toPascalCase(v))
-		names = append(names, b.String())
+		names = append(names, valueName(e.Prefix, v))
 	}
 	return names
 }
@@ -184,12 +223,35 @@ func (e Enum) MappedStrings() []string {
 	s := []string{}
 	for _, v := range e.Values {
 		b := strings.Builder{}
-		b.WriteString(toPascalCase(e.Prefix))
-		b.WriteString(toPascalCase(v))
+		b.WriteString(valueName(e.Prefix, v))
 		b.WriteString(": \"")
-		b.WriteString(toSnakeCase(v))
+		b.WriteString(valueString((v)))
 		b.WriteString("\"")
 		s = append(s, b.String())
 	}
 	return s
+}
+
+// Validate returns an error if the enum is invalid.
+func (e *Enum) Validate() error {
+	if e.Package == "" {
+		return ErrPackageRequred
+	}
+
+	if e.Type == "" {
+		return ErrTypeRequired
+	}
+
+	return nil
+}
+
+func valueName(prefix, value string) string {
+	b := strings.Builder{}
+	b.WriteString(toPascalCase(prefix))
+	b.WriteString(toPascalCase(value))
+	return b.String()
+}
+
+func valueString(v string) string {
+	return toSnakeCase(v)
 }

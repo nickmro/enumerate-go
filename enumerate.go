@@ -5,16 +5,7 @@ import (
 	"errors"
 	"go/format"
 	"io"
-	"regexp"
-	"strings"
 	"text/template"
-)
-
-var (
-	matchFirstCap      = regexp.MustCompile(`(.)([A-Z][a-z]+)`)
-	matchAnyCap        = regexp.MustCompile(`([a-z0-9])([A-Z])`)
-	matchFirstChar     = regexp.MustCompile(`(^[A-Za-z])`)
-	matchFirstWordChar = regexp.MustCompile(`_([A-Za-z])`)
 )
 
 // Write writes an enum file to an io.Writer.
@@ -23,15 +14,8 @@ func Write(e *Enum, w io.Writer) error {
 		return err
 	}
 
-	f := template.FuncMap{
-		"toCamelCase":  ToCamelCase,
-		"toSnakeCase":  ToSnakeCase,
-		"toPascalCase": ToPascalCase,
-	}
-
 	// Create a new template
 	t, err := template.New("enum").
-		Funcs(f).
 		Parse(enumTemplate)
 	if err != nil {
 		return err
@@ -57,38 +41,6 @@ func Write(e *Enum, w io.Writer) error {
 	}
 
 	return nil
-}
-
-// ToSnakeCase transforms a string to snake case.
-func ToSnakeCase(v string) string {
-	v = matchFirstCap.ReplaceAllString(v, `${1}_${2}`)
-	v = matchAnyCap.ReplaceAllString(v, `${1}_${2}`)
-	return strings.ToLower(v)
-}
-
-// ToCamelCase transforms a string to camel case.
-func ToCamelCase(v string) string {
-	v = matchFirstWordChar.ReplaceAllStringFunc(v, func(s string) string {
-		return strings.ToUpper(strings.Replace(s, `_`, ``, -1))
-	})
-
-	// lowercase first character
-	r := []rune(v)
-	r[0] = []rune(strings.ToLower(string(r[0])))[0]
-
-	return string(r)
-}
-
-// ToPascalCase transforms a string to Pascal case (first leter captitalized).
-func ToPascalCase(v string) string {
-	v = matchFirstWordChar.ReplaceAllStringFunc(v, func(s string) string {
-		return strings.ToUpper(strings.Replace(s, `_`, ``, -1))
-	})
-
-	// uppercase first character
-	r := []rune(v)
-	r[0] = []rune(strings.ToUpper(string(r[0])))[0]
-	return string(r)
 }
 
 func validate(enum *Enum) error {

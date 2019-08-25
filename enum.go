@@ -1,5 +1,9 @@
 package enumerate
 
+import (
+	"strings"
+)
+
 // Enum represents an enumeration file template.
 type Enum struct {
 	Package      string   // The package name
@@ -10,48 +14,44 @@ type Enum struct {
 	SQLEncoding  Encoding // The SQL encoding type
 }
 
-const enumTemplate = `
-package {{.Package}}
+const enumTemplate = `package {{.Package}}
 
+{{- $imports := .Imports}}
+{{- if gt (len $imports) 0}}
 import (
-	{{- if .JSONEncoding}}
-	"encoding/json"
-	{{- end}}
-	{{- if .SQLEncoding}}
-	"database/sql/driver"
-	"errors"
+	{{- range $i, $import := $imports}}
+	"{{ $import }}"
 	{{- end}}
 )
+{{- end}}
 
 type {{.Type}} int
 
 // The {{.Type}} values
 const (
 	_ {{.Type}} = iota
-	{{- $prefix := .Prefix}}
-	{{- range $i, $v := .Values}}
-	{{if $prefix}}{{ toPascalCase $prefix }}{{end}}{{ toPascalCase $v }}
+	{{- range $i, $n := .ValueNames}}
+	{{ $n }}
 	{{- end}}
 )
 
-var {{ toCamelCase .Type }}Strings = map[{{.Type}}]string{
-	{{- $prefix := .Prefix}}
-	{{- range $i, $v := .Values}}
-	{{if $prefix}}{{ toPascalCase $prefix }}{{end}}{{ toPascalCase $v }}: "{{ toSnakeCase $v }}",
+var {{ .StringMapName }} = map[{{.Type}}]string{
+	{{- range $i, $s := .MappedStrings}}
+	{{ $s }},
 	{{- end}}
 }
 
 // String returns a string representation of the {{.Type}}.
 func (t {{.Type}}) String() string  {
-	if v, ok := {{ toCamelCase .Type }}Strings[t]; ok {
+	if v, ok := {{ .StringMapName }}[t]; ok {
 		return v
 	}
 	return ""
 }
 
-// {{.Type}}FromString returns the {{.Type}} from the given string.
-func {{ toPascalCase .Type }}FromString(s string) {{.Type}} {
-	for k, v := range {{ toCamelCase .Type }}Strings {
+// {{ .ConstructorName }} returns the {{.Type}} from the given string.
+func {{ .ConstructorName }}(s string) {{.Type}} {
+	for k, v := range {{ .StringMapName }} {
 		if v == s {
 			return k
 		}
@@ -80,7 +80,7 @@ func (t *{{.Type}}) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	{{- if eq .JSONEncoding 1 }}
-	*t = {{ toPascalCase .Type }}FromString(v)
+	*t = {{ .ConstructorName }}(v)
 	{{- else}}
 	*t = v
 	{{- end}}
@@ -108,10 +108,10 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 	}
 
 	if b, ok := bv.([]byte); ok {
-		*t = {{toPascalCase .Type}}FromString(string(b))
+		*t = {{ .ConstructorName }}(string(b))
 		return nil
 	} else if s, ok := bv.(string); ok {
-		*t = {{toPascalCase .Type}}FromString(s)
+		*t = {{ .ConstructorName }}(s)
 		return nil
 	} else {
 		*t = 0
@@ -128,3 +128,68 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 {{- end}}
 
 `
+
+// FileName returns the enum's file name.
+func (e Enum) FileName() string {
+	b := strings.Builder{}
+	b.WriteString(toSnakeCase(e.Type))
+	b.WriteString(".go")
+	return b.String()
+}
+
+// Imports returns an enum file's imports.
+func (e Enum) Imports() []string {
+	imports := []string{}
+	if e.JSONEncoding != 0 {
+		imports = append(imports, "encoding/json")
+	}
+	if e.SQLEncoding != 0 {
+		imports = append(imports,
+			"database/sql/driver",
+			"errors")
+	}
+	return imports
+}
+
+// StringMapName returns the name of the string map.
+func (e Enum) StringMapName() string {
+	b := strings.Builder{}
+	b.WriteString(toCamelCase(e.Type))
+	b.WriteString("Strings")
+	return b.String()
+}
+
+// ConstructorName returns the name of the constructor function.
+func (e Enum) ConstructorName() string {
+	b := strings.Builder{}
+	b.WriteString(toPascalCase(e.Type))
+	b.WriteString("FromString")
+	return b.String()
+}
+
+// ValueNames returns the value names.
+func (e Enum) ValueNames() []string {
+	names := []string{}
+	for _, v := range e.Values {
+		b := strings.Builder{}
+		b.WriteString(toPascalCase(e.Prefix))
+		b.WriteString(toPascalCase(v))
+		names = append(names, b.String())
+	}
+	return names
+}
+
+// MappedStrings returns the strings mapped to a value.
+func (e Enum) MappedStrings() []string {
+	s := []string{}
+	for _, v := range e.Values {
+		b := strings.Builder{}
+		b.WriteString(toPascalCase(e.Prefix))
+		b.WriteString(toPascalCase(v))
+		b.WriteString(": \"")
+		b.WriteString(toSnakeCase(v))
+		b.WriteString("\"")
+		s = append(s, b.String())
+	}
+	return s
+}

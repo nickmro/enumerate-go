@@ -90,7 +90,7 @@ func main() {
 
 	e.Package = p
 
-	f, err := os.Create(fileName(e.Type))
+	f, err := os.Create(e.FileName())
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -114,11 +114,4 @@ func getPackageName(dir string) (string, error) {
 	}
 
 	return pkg.Name, nil
-}
-
-func fileName(name string) string {
-	b := strings.Builder{}
-	b.WriteString(enumerate.ToSnakeCase(name))
-	b.WriteString(".go")
-	return b.String()
 }

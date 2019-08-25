@@ -11,49 +11,67 @@ import (
 	"github.com/nickmro/enumerate-go"
 )
 
+const usageText = `Usage:
+ enumerate [OPTION]...
+
+Options:
+ -type    The enum type name (Required)
+ -values  The enum values
+ -prefix  The prefix to apply to each enum value
+ -json    The JSON encoding type {string, int}
+ -sql     The SQL encoding type {string, int}
+ -help    Print usage
+`
+
 func main() {
-	enumType := flag.String("type", "", "The enum type name (Required)")
-	enumValues := flag.String("values", "", "The comma-separated list of enum values")
-	enumPrefix := flag.String("prefix", "", "The prefix to apply to each enum value")
-	enumJSON := flag.String("json", "", "The JSON encoding type {string, int}")
-	enumSQL := flag.String("sql", "", "The SQL encoding type {string, int}")
+	typeOpt := flag.String("type", "", "The enum type name (Required)")
+	valuesOpt := flag.String("values", "", "The comma-separated list of enum values")
+	prefixOpt := flag.String("prefix", "", "The prefix to apply to each enum value")
+	jsonOpt := flag.String("json", "", "The JSON encoding type {string, int}")
+	sqlOpt := flag.String("sql", "", "The SQL encoding type {string, int}")
+	printOpt := flag.Bool("help", false, "Print usage")
 
 	var e enumerate.Enum
 
 	if flag.Parse(); !flag.Parsed() {
-		flag.PrintDefaults()
+		fmt.Println(usageText)
 		os.Exit(1)
 	}
 
-	if enumType == nil || *enumType == "" {
-		flag.PrintDefaults()
+	if printOpt != nil && *printOpt {
+		fmt.Println(usageText)
 		os.Exit(1)
 	}
 
-	e.Type = *enumType
-
-	if enumValues != nil && *enumValues != "" {
-		e.Values = strings.Split(*enumValues, ",")
+	if typeOpt == nil || *typeOpt == "" {
+		fmt.Println(usageText)
+		os.Exit(1)
 	}
 
-	if enumPrefix != nil {
-		e.Prefix = *enumPrefix
+	e.Type = *typeOpt
+
+	if valuesOpt != nil && *valuesOpt != "" {
+		e.Values = strings.Split(*valuesOpt, ",")
 	}
 
-	if enumJSON != nil && *enumJSON != "" {
-		if j := enumerate.EncodingFromString(*enumJSON); j != 0 {
+	if prefixOpt != nil {
+		e.Prefix = *prefixOpt
+	}
+
+	if jsonOpt != nil && *jsonOpt != "" {
+		if j := enumerate.EncodingFromString(*jsonOpt); j != 0 {
 			e.JSONEncoding = j
 		} else {
-			flag.PrintDefaults()
+			fmt.Println(usageText)
 			os.Exit(1)
 		}
 	}
 
-	if enumSQL != nil && *enumSQL != "" {
-		if s := enumerate.EncodingFromString(*enumSQL); s != 0 {
+	if sqlOpt != nil && *sqlOpt != "" {
+		if s := enumerate.EncodingFromString(*sqlOpt); s != 0 {
 			e.SQLEncoding = s
 		} else {
-			flag.PrintDefaults()
+			fmt.Println(usageText)
 			os.Exit(1)
 		}
 	}

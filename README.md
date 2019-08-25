@@ -4,7 +4,7 @@ Enumerate is an enumeration generator for Go.
 
 ## Why?
 
-Writing enumerations in Go is often a very repetitive task, which is an ideal case for a code generator.
+Writing enumerations in Go can be achieved using a type alias, but adding methods to represent those enumerations as strings can be reptitive. This code generator eases the process.
 
 ## Installation
 

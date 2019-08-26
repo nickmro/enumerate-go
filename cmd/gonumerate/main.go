@@ -20,6 +20,7 @@ Options:
  -prefix  The prefix to apply to each enum value
  -json    The JSON encoding type {string, int}
  -sql     The SQL encoding type {string, int}
+ -o       The output filename
  -help    Print usage
 `
 
@@ -29,6 +30,7 @@ func main() {
 	prefixOpt := flag.String("prefix", "", "The prefix to apply to each enum value")
 	jsonOpt := flag.String("json", "", "The JSON encoding type {string, int}")
 	sqlOpt := flag.String("sql", "", "The SQL encoding type {string, int}")
+	outputOpt := flag.String("o", "", "The output filename")
 	printOpt := flag.Bool("help", false, "Print usage")
 
 	var e gonumerate.Enum
@@ -76,6 +78,10 @@ func main() {
 		}
 	}
 
+	if outputOpt != nil && *outputOpt != "" {
+		e.OutFile = *outputOpt
+	}
+
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -87,7 +93,6 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
 	e.Package = p
 
 	f, err := os.Create(e.FileName())

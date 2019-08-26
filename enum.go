@@ -17,6 +17,7 @@ type Enum struct {
 	Prefix       string   // The prefix to apply to each enum
 	JSONEncoding Encoding // The JSON encoding type
 	SQLEncoding  Encoding // The SQL encoding type
+	OutFile      string   // The output filename
 }
 
 const enumTemplate = `package {{.Package}}
@@ -173,10 +174,14 @@ func (e *Enum) Write(w io.Writer) error {
 
 // FileName returns the enum's file name.
 func (e Enum) FileName() string {
-	b := strings.Builder{}
-	b.WriteString(toSnakeCase(e.Type))
-	b.WriteString(".go")
-	return b.String()
+	if e.OutFile != "" {
+		return e.OutFile
+	} else {
+		b := strings.Builder{}
+		b.WriteString(toSnakeCase(e.Type))
+		b.WriteString(".go")
+		return b.String()
+	}
 }
 
 // Imports returns an enum file's imports.

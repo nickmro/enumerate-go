@@ -1,4 +1,4 @@
-package gonumerate
+package main
 
 import (
 	"bytes"

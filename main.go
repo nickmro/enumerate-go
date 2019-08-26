@@ -8,8 +8,6 @@ import (
 	"go/build"
 	"os"
 	"strings"
-
-	"github.com/nickmro/gonumerate"
 )
 
 const usageText = `Usage:
@@ -38,7 +36,7 @@ var (
 )
 
 func main() {
-	var e gonumerate.Enum
+	var e Enum
 	var err error
 
 	if flag.Parse(); !flag.Parsed() {
@@ -126,9 +124,9 @@ func parsePrefix() string {
 	return ""
 }
 
-func parseJSON() (gonumerate.Encoding, error) {
+func parseJSON() (Encoding, error) {
 	if jsonOpt != nil && *jsonOpt != "" {
-		if j := gonumerate.EncodingFromString(*jsonOpt); j != 0 {
+		if j := EncodingFromString(*jsonOpt); j != 0 {
 			return j, nil
 		}
 		return 0, errors.New("invalid json value")
@@ -136,9 +134,9 @@ func parseJSON() (gonumerate.Encoding, error) {
 	return 0, nil
 }
 
-func parseSQL() (gonumerate.Encoding, error) {
+func parseSQL() (Encoding, error) {
 	if sqlOpt != nil && *sqlOpt != "" {
-		if s := gonumerate.EncodingFromString(*sqlOpt); s != 0 {
+		if s := EncodingFromString(*sqlOpt); s != 0 {
 			return s, nil
 		}
 		return 0, errors.New("invalid sql value")

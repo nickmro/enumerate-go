@@ -8,9 +8,7 @@ Gonumerate is an enumeration generator for Go.
 ## Installation
 
 ```
-go get -u github.com/nickmro/gonumerate
-cd $GOPATH/src/github.com/nickmro/gonumerate/cmd/gonumerate
-go build -o $GOPATH/bin/gonumerate
+go get github.com/nickmro/gonumerate
 ```
 
 ## Usage

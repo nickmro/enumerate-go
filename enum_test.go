@@ -1,10 +1,10 @@
-package gonumerate_test
+package main_test
 
 import (
 	"bytes"
 	"testing"
 
-	"github.com/nickmro/gonumerate"
+	. "github.com/nickmro/gonumerate"
 )
 
 func TestWrite(t *testing.T) {
@@ -144,8 +144,8 @@ func TestValidate(t *testing.T) {
 	if err == nil {
 		t.Error("expected", err, "to occur")
 	}
-	if err != gonumerate.ErrPackageRequred {
-		t.Error("expected", err, "to equal", gonumerate.ErrPackageRequred)
+	if err != ErrPackageRequred {
+		t.Error("expected", err, "to equal", ErrPackageRequred)
 	}
 
 	// When type is not specified
@@ -155,18 +155,18 @@ func TestValidate(t *testing.T) {
 	if err == nil {
 		t.Error("expected", err, "to occur")
 	}
-	if err != gonumerate.ErrTypeRequired {
-		t.Error("expected", err, "to equal", gonumerate.ErrTypeRequired)
+	if err != ErrTypeRequired {
+		t.Error("expected", err, "to equal", ErrTypeRequired)
 	}
 }
 
-func enum() *gonumerate.Enum {
-	return &gonumerate.Enum{
+func enum() *Enum {
+	return &Enum{
 		Package:      "package_name",
 		Type:         "UserType",
 		Prefix:       "UserType",
 		Values:       []string{"Admin", "CustomerSupport"},
-		JSONEncoding: gonumerate.EncodingString,
-		SQLEncoding:  gonumerate.EncodingString,
+		JSONEncoding: EncodingString,
+		SQLEncoding:  EncodingString,
 	}
 }

@@ -1,4 +1,4 @@
-package gonumerate
+package main
 
 // Encoding is an enumeration of encoding types
 type Encoding int

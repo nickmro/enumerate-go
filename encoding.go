@@ -1,5 +1,6 @@
 package gonumerate
 
+// Encoding is an enumeration of encoding types
 type Encoding int
 
 // The Encoding values

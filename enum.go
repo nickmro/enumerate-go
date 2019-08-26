@@ -3,6 +3,7 @@ package gonumerate
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"go/format"
 	"io"
 	"strings"
@@ -13,6 +14,7 @@ import (
 type Enum struct {
 	Package      string   // The package name
 	Type         string   // The enum type name
+	Description  string   // The enum description
 	Values       []string // The enum values
 	Prefix       string   // The prefix to apply to each enum
 	JSONEncoding Encoding // The JSON encoding type
@@ -31,6 +33,11 @@ import (
 )
 {{- end}}
 
+{{- if .Description}}
+// {{.Description}}
+{{- else }}
+// {{.Type}} is an enumeration of values
+{{- end}}
 type {{.Type}} int
 
 // The {{.Type}} values
@@ -134,8 +141,12 @@ func (t *{{.Type}}) Scan(v interface{}) error {
 {{- end}}
 `
 
-var ErrPackageRequred = errors.New("package required")
-var ErrTypeRequired = errors.New("type required")
+// Enum errors
+var (
+	ErrPackageRequred     = errors.New("package required")
+	ErrTypeRequired       = errors.New("type required")
+	ErrDescriptionInvalid = errors.New("description invalid")
+)
 
 // Write writes an enum file to an io.Writer.
 func (e *Enum) Write(w io.Writer) error {
@@ -176,12 +187,12 @@ func (e *Enum) Write(w io.Writer) error {
 func (e Enum) FileName() string {
 	if e.OutFile != "" {
 		return e.OutFile
-	} else {
-		b := strings.Builder{}
-		b.WriteString(toSnakeCase(e.Type))
-		b.WriteString(".go")
-		return b.String()
 	}
+
+	b := strings.Builder{}
+	b.WriteString(toSnakeCase(e.Type))
+	b.WriteString(".go")
+	return b.String()
 }
 
 // Imports returns an enum file's imports.
@@ -245,6 +256,10 @@ func (e *Enum) Validate() error {
 
 	if e.Type == "" {
 		return ErrTypeRequired
+	}
+
+	if e.Description != "" && !strings.HasPrefix(e.Description, fmt.Sprintf("%s is", e.Type)) {
+		return ErrDescriptionInvalid
 	}
 
 	return nil

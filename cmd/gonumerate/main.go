@@ -15,17 +15,19 @@ const usageText = `Usage:
  gonumerate [OPTION]...
 
 Options:
- -type    The enum type name (Required)
- -values  The enum values
- -prefix  The prefix to apply to each enum value
- -json    The JSON encoding type {string, int}
- -sql     The SQL encoding type {string, int}
- -o       The output filename
- -help    Print usage
+ -type        The enum type name (Required)
+ -description The type comment description (must have format "<type> is...")
+ -values      The enum values
+ -prefix      The prefix to apply to each enum value
+ -json        The JSON encoding type {string, int}
+ -sql         The SQL encoding type {string, int}
+ -o           The output filename
+ -help        Print usage
 `
 
 func main() {
 	typeOpt := flag.String("type", "", "The enum type name (Required)")
+	descOpt := flag.String("description", "", "The type comment description (must be format \"<type> is...\")")
 	valuesOpt := flag.String("values", "", "The comma-separated list of enum values")
 	prefixOpt := flag.String("prefix", "", "The prefix to apply to each enum value")
 	jsonOpt := flag.String("json", "", "The JSON encoding type {string, int}")
@@ -51,6 +53,10 @@ func main() {
 	}
 
 	e.Type = *typeOpt
+
+	if descOpt != nil && *descOpt != "" {
+		e.Description = *descOpt
+	}
 
 	if valuesOpt != nil && *valuesOpt != "" {
 		e.Values = strings.Split(*valuesOpt, ",")
@@ -107,7 +113,10 @@ func main() {
 
 	err = e.Write(w)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error: ", err)
+		fmt.Println()
+		fmt.Println(usageText)
+		os.Remove(e.FileName())
 		os.Exit(1)
 	}
 }

@@ -123,7 +123,7 @@ func TestMappedStrings(t *testing.T) {
 
 	for i, v := range expected {
 		if s[i] != v {
-			t.Error("expeced", s[i], "to equal", v)
+			t.Error("expected", s[i], "to equal", v)
 		}
 	}
 }

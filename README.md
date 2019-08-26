@@ -9,7 +9,7 @@ Writing enumerations in Go can be achieved using a type alias, but adding method
 
 ## Installation
 
-```bash
+```
 go get -u github.com/nickmro/gonumerate
 cd $GOPATH/src/github.com/nickmro/gonumerate/cmd/gonumerate
 go build -o $GOPATH/bin/gonumerate
@@ -27,6 +27,7 @@ Options:
  -prefix  The prefix to apply to each enum value
  -json    The JSON encoding type {string, int}
  -sql     The SQL encoding type {string, int}
+ -o       The output filename
  -help    Print usage
 ```
 
@@ -122,6 +123,21 @@ func (t *UserType) Scan(v interface{}) error {
 	}
 }
 ```
+
+## go generate
+
+This command can be run with `go generate`. Simply add the command as a comment to any `.go` file in your directory. For example:
+
+```go
+//go:generate gonumerate --type UserType --values Admin,Support
+```
+
+Then run:
+```bash
+go generate
+```
+
+For more information about `go generate`: https://blog.golang.org/generate
 
 ## Other options
 

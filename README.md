@@ -3,10 +3,6 @@
 
 Gonumerate is an enumeration generator for Go.
 
-## Why?
-
-Writing enumerations in Go can be achieved using a type alias, but adding methods to represent those enumerations as strings can be reptitive. This code generator eases the process.
-
 ## Installation
 
 ```
@@ -124,10 +120,11 @@ func (t *UserType) Scan(v interface{}) error {
 }
 ```
 
-## go generate
+## Go Generate
 
-This command can be run with `go generate`. Simply add the command as a comment to any `.go` file in your directory. For example:
+To use `go generate`, add the command as a comment to any `.go` file in your directory.
 
+Example:
 ```go
 //go:generate gonumerate --type UserType --values Admin,Support
 ```
@@ -137,7 +134,7 @@ Then run:
 go generate
 ```
 
-For more information about `go generate`: https://blog.golang.org/generate
+For more information: https://blog.golang.org/generate
 
 ## Other options
 

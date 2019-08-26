@@ -130,9 +130,8 @@ func parseJSON() (gonumerate.Encoding, error) {
 	if jsonOpt != nil && *jsonOpt != "" {
 		if j := gonumerate.EncodingFromString(*jsonOpt); j != 0 {
 			return j, nil
-		} else {
-			return 0, errors.New("invalid json value")
 		}
+		return 0, errors.New("invalid json value")
 	}
 	return 0, nil
 }
@@ -141,9 +140,8 @@ func parseSQL() (gonumerate.Encoding, error) {
 	if sqlOpt != nil && *sqlOpt != "" {
 		if s := gonumerate.EncodingFromString(*sqlOpt); s != 0 {
 			return s, nil
-		} else {
-			return 0, errors.New("invalid sql value")
 		}
+		return 0, errors.New("invalid sql value")
 	}
 	return 0, nil
 }

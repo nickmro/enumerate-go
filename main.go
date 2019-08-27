@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/build"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -67,16 +68,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	e.Package, err = parsePackageName()
-	if err != nil {
-		printError(err)
-		os.Exit(1)
-	}
-
 	e.Description = parseDescription()
 	e.Values = parseValues()
 	e.Prefix = parsePrefix()
 	e.OutFile = praseOutFile()
+
+	e.Package, err = parsePackageName(e.OutFile)
+	if err != nil {
+		printError(err)
+		os.Exit(1)
+	}
 
 	f, err := os.Create(e.FileName())
 	if err != nil {
@@ -151,14 +152,20 @@ func praseOutFile() string {
 	return ""
 }
 
-func parsePackageName() (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+func parsePackageName(file string) (string, error) {
+	var dir string
+	var err error
+
+	if file != "" {
+		dir = filepath.Dir(file)
+	} else {
+		dir, err = os.Getwd()
+		if err != nil {
+			return "", err
+		}
 	}
 
-	pkg, err := build.ImportDir(wd, 0)
+	pkg, err := build.ImportDir(dir, 0)
 	if err != nil {
 		return "", err
 	}

@@ -47,6 +47,7 @@ import (
 	"errors"
 )
 
+// UserType is an enumeration of values
 type UserType int
 
 // The UserType values

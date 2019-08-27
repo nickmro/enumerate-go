@@ -36,7 +36,7 @@ import (
 {{- if .Description}}
 // {{.Description}}
 {{- else }}
-// {{.Type}} is an enumeration of values
+// {{.Type}} is an enumeration of {{.Type}} values
 {{- end}}
 type {{.Type}} int
 

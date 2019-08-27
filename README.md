@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/nickmro/gonumerate)](https://goreportcard.com/report/github.com/nickmro/gonumerate)
 
 
-Gonumerate is an enumeration generator for Go.
+Gonumerate is an enum code generator for Go.
 
 ## Installation
 

@@ -103,7 +103,7 @@ func (t *{{.Type}}) UnmarshalJSON(b []byte) error {
 
 {{- if .SQLEncoding}}
 // Value returns the {{.Type}} value for SQL encoding.
-func (t *{{.Type}}) Value() (driver.Value, error) {
+func (t {{.Type}}) Value() (driver.Value, error) {
 	{{- if eq .SQLEncoding 1 }}
 	return t.String(), nil
 	{{- else}}
